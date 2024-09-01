@@ -1,20 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import "react-native-gesture-handler";
+import * as React from "react";
+import { View, Text } from "react-native";
+import { Provider } from "react-redux";
+
+import { NavigationContainer } from "@react-navigation/native";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import store from "./src/redux/store";
+import AuthStack from "./src/navigation/AuthStack";
+import MainStack from "./src/navigation/MainStack";
+import AppNavigator from "./src/navigation/AppNavigator";
+import { saveUserData } from "./src/redux/reducers/auth";
+import { getData } from "./src/utils/helperFunctions";
+
+const { dispatch } = store;
 
 export default function App() {
+  React.useEffect(() => {
+    initUser();
+  }, []);
+
+  const initUser = async () => {
+    try {
+      let data = await getData("userData");
+      console.log("stored data", data);
+      if (!!data) {
+        dispatch(saveUserData(JSON.parse(data)));
+      }
+    } catch (error) {
+      console.log("no data found");
+    }
+  };
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
