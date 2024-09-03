@@ -12,7 +12,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
   const [date, setDate] = React.useState(new Date());
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const userId = userData?._id;
-
+  console.log("userData", userData);
   // Watch advanced and balance payments to calculate total payment dynamically
   const advancedPayment = watch("advancedPayment", "0");
   const balancePayment = watch("balancePayment", "0");
