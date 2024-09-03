@@ -1,5 +1,13 @@
 import React from "react";
-import { View, Text, TextInput, StyleSheet, ScrollView, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button } from "react-native-paper";
@@ -7,23 +15,21 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { launchImageLibrary } from "react-native-image-picker";
 
-
 export default function DispatchNoteForm({ navigation, onFormSuccess }) {
   const userData = useSelector((state) => state?.auth?.userData);
   const { control, handleSubmit } = useForm();
   const [date, setDate] = React.useState(new Date());
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const userId = userData?._id;
-  const agentName = userData?.name
+  const agentName = userData?.name;
   const [image, setImage] = React.useState(null);
-
 
   const handleImagePicker = () => {
     const options = {
       mediaType: "photo",
       includeBase64: true,
     };
-  
+
     launchImageLibrary(options, (response) => {
       if (response.didCancel) {
         console.log("User cancelled image picker");
@@ -35,7 +41,6 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
       }
     });
   };
-  
 
   console.log(date);
 
@@ -44,13 +49,20 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
     const order_date = moment(currentDate).format("DD-MM-YYYY");
     const deliveryDate = moment(date).format("DD-MM-YYYY");
     const orderId = Date.now().toString(); // Generating a unique order ID
-    const formData = { ...data, orderId, userId, order_date, deliveryDate, agentName };
+    const formData = {
+      ...data,
+      orderId,
+      userId,
+      order_date,
+      deliveryDate,
+      agentName,
+    };
     console.log("Submitting form data:", formData);
 
     const handleCreate = async () => {
       try {
         const response = await fetch(
-          `http://192.168.29.247:3001/create-order`,
+          `http://192.168.29.124:3001/create-order`,
           {
             method: "POST",
             headers: {
@@ -83,7 +95,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
 
   return (
     <View style={styles.container}>
-      <ScrollView >
+      <ScrollView>
         <Text style={styles.title}>Dispatch Note Form</Text>
 
         {/* Sender Name */}
@@ -113,7 +125,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
               style={styles.input}
               value={value}
               onChangeText={onChange}
-               keyboardType="numeric"
+              keyboardType="numeric"
             />
           )}
         />
@@ -143,7 +155,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
               style={styles.input}
               value={value}
               onChangeText={onChange}
-               keyboardType="numeric"
+              keyboardType="numeric"
             />
           )}
         />
@@ -159,7 +171,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
               style={styles.input}
               value={value}
               onChangeText={onChange}
-               keyboardType="numeric"
+              keyboardType="numeric"
             />
           )}
         />
@@ -335,58 +347,56 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
           )}
         />
 
-  {/* Total Payment */}
-      <Text style={styles.label}>Total Payment:</Text>
-      <Controller
-        control={control}
-        name="totalPayment"
-        defaultValue="0"
-        render={({ field: { value } }) => (
-          <TextInput
-            style={styles.input}
-            value={value}
-            editable={false} // Calculated field
-          />
-        )}
-      />
+        {/* Total Payment */}
+        <Text style={styles.label}>Total Payment:</Text>
+        <Controller
+          control={control}
+          name="totalPayment"
+          defaultValue="0"
+          render={({ field: { value } }) => (
+            <TextInput
+              style={styles.input}
+              value={value}
+              editable={false} // Calculated field
+            />
+          )}
+        />
 
-      {/* Advanced Payment */}
-      <Text style={styles.label}>Advanced Payment:</Text>
-      <Controller
-        control={control}
-        name="advance_payment"
-        defaultValue="0"
-        render={({ field: { value, onChange } }) => (
-          <TextInput
-            style={styles.input}
-            value={value}
-            onChangeText={onChange}
-            keyboardType="numeric"
-          />
-        )}
-      />
+        {/* Advanced Payment */}
+        <Text style={styles.label}>Advanced Payment:</Text>
+        <Controller
+          control={control}
+          name="advance_payment"
+          defaultValue="0"
+          render={({ field: { value, onChange } }) => (
+            <TextInput
+              style={styles.input}
+              value={value}
+              onChangeText={onChange}
+              keyboardType="numeric"
+            />
+          )}
+        />
 
-      {/* Balance Payment */}
-      <Text style={styles.label}>Balance Payment:</Text>
-      <Controller
-        control={control}
-        name="balance_payment"
-        defaultValue="0"
-        render={({ field: { value, onChange } }) => (
-          <TextInput
-            style={styles.input}
-            value={value}
-            onChangeText={onChange}
-            keyboardType="numeric"
-          />
-        )}
-      />
-
-       
+        {/* Balance Payment */}
+        <Text style={styles.label}>Balance Payment:</Text>
+        <Controller
+          control={control}
+          name="balance_payment"
+          defaultValue="0"
+          render={({ field: { value, onChange } }) => (
+            <TextInput
+              style={styles.input}
+              value={value}
+              onChangeText={onChange}
+              keyboardType="numeric"
+            />
+          )}
+        />
       </ScrollView>
-       <Button onPress={handleSubmit(onSubmit)} mode="contained">
-          Submit
-        </Button>
+      <Button onPress={handleSubmit(onSubmit)} mode="contained">
+        Submit
+      </Button>
     </View>
   );
 }

@@ -10,8 +10,10 @@ import DispatchNoteForm from "../agent/DispatchNoteForm";
 
 const CakeBookingList = ({ navigation }) => {
   const userData = useSelector((state) => state?.auth?.userData);
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isModalVisible1, setModalVisible1] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -26,8 +28,8 @@ const CakeBookingList = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    filterPostsByDate();
-  }, [date, posts]);
+    filterPostsByDateRange();
+  }, [startDate, endDate, posts]);
 
   const userPosts = async () => {
     try {
@@ -47,17 +49,34 @@ const CakeBookingList = ({ navigation }) => {
       }
 
       const data = await response.json();
+
+      // Parse and format dates here if needed
+
       setPosts(data);
     } catch (error) {
       console.log("error raised", error);
     }
   };
 
-  const filterPostsByDate = () => {
-    const selectedDate = moment(date).format("DD-MM-YYYY");
-    const filtered = posts.filter((post) => post.order_date === selectedDate);
+  const filterPostsByDateRange = () => {
+    const filtered = posts.filter((post) => {
+      const postDate = moment(post.order_date, "DD-MM-YYYY");
+      const startMoment = moment(startDate, "DD-MM-YYYY");
+      const endMoment = moment(endDate, "DD-MM-YYYY");
+
+      console.log("Post Date:", postDate.format("DD-MM-YYYY"));
+      console.log("Start Date:", startMoment.format("DD-MM-YYYY"));
+      console.log("End Date:", endMoment.format("DD-MM-YYYY"));
+
+      return (
+        postDate.isSameOrAfter(startMoment) &&
+        postDate.isSameOrBefore(endMoment)
+      );
+    });
     setFilteredPosts(filtered);
   };
+
+  console.log("filteredPosts", filteredPosts);
 
   const handleDelete = async (bookingId) => {
     try {
@@ -110,18 +129,36 @@ const CakeBookingList = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Button onPress={() => setShowDatePicker(true)}>
-        {moment(date).format("DD-MM-YYYY")}
-      </Button>
-      {showDatePicker && (
+      <View style={styles.dateRangeContainer}>
+        <Button onPress={() => setShowStartDatePicker(true)}>
+          From: {moment(startDate).format("DD-MM-YYYY")}
+        </Button>
+        <Button onPress={() => setShowEndDatePicker(true)}>
+          To: {moment(endDate).format("DD-MM-YYYY")}
+        </Button>
+      </View>
+      {showStartDatePicker && (
         <DateTimePicker
-          value={date}
+          value={startDate}
           mode="date"
           display="default"
           onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
+            setShowStartDatePicker(false);
             if (selectedDate) {
-              setDate(selectedDate);
+              setStartDate(selectedDate);
+            }
+          }}
+        />
+      )}
+      {showEndDatePicker && (
+        <DateTimePicker
+          value={endDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowEndDatePicker(false);
+            if (selectedDate) {
+              setEndDate(selectedDate);
             }
           }}
         />
@@ -256,8 +293,7 @@ const CakeBookingList = ({ navigation }) => {
             />
           </View>
 
-          <Button onPress={handleSave}>Save</Button>
-          <Button onPress={() => setModalVisible(false)}>cancel</Button>
+          <Button onPress={handleSave}>Save Changes</Button>
         </View>
       </Modal>
 
@@ -272,7 +308,10 @@ const CakeBookingList = ({ navigation }) => {
             showBackButton={true}
             onBackPress={() => setModalVisible1(false)}
           />
-          <DispatchNoteForm onFormSuccess={handleFormSuccess} />
+          <DispatchNoteForm
+            formData={formData}
+            onFormSuccess={handleFormSuccess}
+          />
         </View>
       </Modal>
     </View>
@@ -282,18 +321,16 @@ const CakeBookingList = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
-    padding: 10,
-  },
-  list: {
-    paddingBottom: 80,
+    padding: 16,
   },
   card: {
-    marginBottom: 10,
-    backgroundColor: "#ffffff",
+    marginBottom: 16,
   },
   iconContainer: {
     flexDirection: "row",
+  },
+  list: {
+    paddingBottom: 80,
   },
   fab: {
     position: "absolute",
@@ -313,6 +350,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
+  },
+  dateRangeContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
   },
 });
 
