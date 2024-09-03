@@ -82,7 +82,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
     const handleCreate = async () => {
       try {
         const response = await fetch(
-          `http://192.168.29.247:3001/create-order`,
+          `http://192.168.29.124:3001/create-order`,
           {
             method: "POST",
             headers: {
@@ -129,7 +129,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
               style={styles.input}
               value={value}
               onChangeText={onChange}
-              editable={false} // Disabled as it's static
+              // editable={false} // Disabled as it's static
             />
           )}
         />
