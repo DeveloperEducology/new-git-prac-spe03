@@ -27,6 +27,9 @@ const Settings = ({ navigation }) => {
       <Button onPress={() => navigation.navigate("CreateAgent")}>
         Create Agent
       </Button>
+      <Button onPress={() => navigation.navigate("dispatch-form")}>
+        Create order
+      </Button>
     </View>
   );
 };

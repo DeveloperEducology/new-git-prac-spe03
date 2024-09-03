@@ -21,7 +21,6 @@ const PhoneLoginScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setLoading] = useState(false);
 
-  // console.log("route params", route.params);
 
   React.useEffect(() => {
     initUser();
@@ -37,7 +36,6 @@ const PhoneLoginScreen = ({ navigation }) => {
       console.log("no data found");
     }
   };
-
 
   const isValidData = () => {
     const error = validator({
@@ -64,8 +62,8 @@ const PhoneLoginScreen = ({ navigation }) => {
         console.log("login api res", res);
         setLoading(false);
         // if (!!res.data) {
-          navigation.navigate("otp", { data: res.data });
-          // return;
+        navigation.navigate("otp", { data: res.data });
+        // return;
         // }
       } catch (error) {
         console.log("error in login api", error);

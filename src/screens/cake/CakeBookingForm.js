@@ -3,17 +3,30 @@ import { View, Text } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { TextInput, Button, RadioButton, Divider } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useSelector } from "react-redux";
 
 const CakeBookingForm = () => {
   const { control, handleSubmit, formState: { errors } } = useForm();
   const [date, setDate] = React.useState(new Date());
+  const userData = useSelector((state) => state?.auth?.userData);
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [paymentMethod, setPaymentMethod] = React.useState('online');
 
-  const onSubmit = data => {
-    console.log(data);
-  };
+  const onSubmit = (data) => {
+    const orderId = Date.now().toString()
+    // const totalPayment = parseFloat(data.advancedPayment) + parseFloat(data.balancePayment);
+    
+    const formData = {
+      ...data,
+      orderId,
+      userId,
+      // totalPayment,
+      delivery_date: moment(date).format("YYYY-MM-DD"),
+    };
 
+    console.log(formData);
+    // Make API call to backend with formData
+  };
   return (
     <View style={{ padding: 20 }}>
       <Controller

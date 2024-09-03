@@ -135,7 +135,7 @@ export const otpVerify = (data, token = null) => {
         if (res.data) {
           storeData("userData")
             .then((value) => {
-              console.log("im here");
+              console.log("im here", res.data);
               dispatch(saveUserData(res.data));
               resolve(res);
             })

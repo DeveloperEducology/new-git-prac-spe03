@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   FlatList,
@@ -8,81 +8,31 @@ import {
   Button,
 } from "react-native";
 import { FAB, Card, Paragraph, IconButton } from "react-native-paper";
-import actions from '../../redux/actions'
+import actions from "../../redux/actions";
 import { deletePost } from "../../redux/actions/posts";
-
-const sampleBookings = [
-  {
-    id: "1",
-    senderName: "Alice",
-    senderPhoneNumber: "1234567890",
-    receiverName: "Bob",
-    receiverPhoneNumber: "0987654321",
-    cakeName: "Chocolate Cake",
-    cakeType: "Buttercream",
-    weightOrQuantity: "2 Kg",
-    specialWishes: "Happy Birthday Bob!",
-    date: "2024-09-01",
-    time: "10:00 AM",
-  },
-  {
-    id: "2",
-    senderName: "Carol",
-    senderPhoneNumber: "1234509876",
-    receiverName: "Dave",
-    receiverPhoneNumber: "6789012345",
-    cakeName: "Vanilla Cake",
-    cakeType: "Fondant",
-    weightOrQuantity: "1.5 Kg",
-    specialWishes: "Congratulations Dave!",
-    date: "2024-09-05",
-    time: "2:00 PM",
-  },
-  {
-    id: "3",
-    senderName: "Eve",
-    senderPhoneNumber: "5678901234",
-    receiverName: "Frank",
-    receiverPhoneNumber: "4321098765",
-    cakeName: "Red Velvet Cake",
-    cakeType: "Cream Cheese",
-    weightOrQuantity: "1 Kg",
-    specialWishes: "Happy Anniversary!",
-    date: "2024-09-10",
-    time: "5:00 PM",
-  },
-];
+import DispatchNoteForm from "../agent/DispatchNoteForm";
+import Header from "../../components/Header";
 
 const CakeBookingList = ({ navigation }) => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isModalVisible1, setModalVisible1] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [formData, setFormData] = useState({});
-  const [posts, setPosts] = useState([])
-
-  console.log("posts", posts)
-
-  const handleEdit = (booking) => {
-    setSelectedBooking(booking);
-    setFormData(booking);
-    setModalVisible(true);
-  };
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    userPosts()
-}, [])
+    userPosts();
+  }, []);
 
-const userPosts = async () => {
+  const userPosts = async () => {
     try {
-        const res = await actions.getAllPost()
-        console.log("res++++", res)
-        setPosts(res)
+      const res = await actions.getAllPost();
+      setPosts(res);
     } catch (error) {
-        console.log("error raised", error)
+      console.log("Error fetching posts:", error);
     }
-}
+  };
 
-
-  // This is how you would call deletePost
   const handleDelete = async (bookingId) => {
     try {
       const response = await fetch(
@@ -91,19 +41,16 @@ const userPosts = async () => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            // Authorization: `Bearer ${user?.token}`, // Assuming you're using JWT
           },
         }
       );
-
-      const result = await response.json();
 
       if (response.ok) {
         alert("Booking deleted successfully");
         userPosts();
       } else {
+        const result = await response.json();
         alert(result.message || "Failed to delete booking");
-        console.log(result.message)
       }
     } catch (error) {
       console.error("Error deleting booking:", error);
@@ -111,6 +58,20 @@ const userPosts = async () => {
     }
   };
 
+  const handleEdit = (booking) => {
+    setSelectedBooking(booking);
+    setFormData(booking);
+    setModalVisible(true);
+  };
+
+  const handleCreate = () => {
+    setModalVisible1(true);
+  };
+
+  const handleFormSuccess = () => {
+    setModalVisible1(false);
+    userPosts(); // Reload the posts after form submission
+  };
 
   const handleInputChange = (name, value) => {
     setFormData({ ...formData, [name]: value });
@@ -164,84 +125,38 @@ const userPosts = async () => {
         style={styles.fab}
         small
         icon="plus"
-        onPress={() => navigation.navigate("form")}
+        onPress={handleCreate}
       />
 
-      {/* Edit Modal */}
       <Modal
         visible={isModalVisible}
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Sender Name"
-            value={formData.senderName}
-            onChangeText={(value) => handleInputChange("senderName", value)}
+          <Header
+            title="Edit Booking"
+            showBackButton={true}
+            onBackPress={() => setModalVisible(false)}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Sender Phone Number"
-            value={formData.senderPhoneNumber}
-            onChangeText={(value) =>
-              handleInputChange("senderPhoneNumber", value)
-            }
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Receiver Name"
-            value={formData.receiverName}
-            onChangeText={(value) => handleInputChange("receiverName", value)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Receiver Phone Number"
-            value={formData.receiverPhoneNumber}
-            onChangeText={(value) =>
-              handleInputChange("receiverPhoneNumber", value)
-            }
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Cake Name"
-            value={formData.cakeName}
-            onChangeText={(value) => handleInputChange("cakeName", value)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Cake Type"
-            value={formData.cakeType}
-            onChangeText={(value) => handleInputChange("cakeType", value)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Weight/Quantity"
-            value={formData.weightOrQuantity}
-            onChangeText={(value) =>
-              handleInputChange("weightOrQuantity", value)
-            }
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Special Wishes"
-            value={formData.specialWishes}
-            onChangeText={(value) => handleInputChange("specialWishes", value)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Date"
-            value={formData.date}
-            onChangeText={(value) => handleInputChange("date", value)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Time"
-            value={formData.time}
-            onChangeText={(value) => handleInputChange("time", value)}
-          />
+          {/* Your form inputs here */}
           <Button title="Save" onPress={handleSave} />
           <Button title="Cancel" onPress={() => setModalVisible(false)} />
+        </View>
+      </Modal>
+
+      <Modal
+        visible={isModalVisible1}
+        animationType="slide"
+        onRequestClose={() => setModalVisible1(false)}
+      >
+        <View style={styles.modalContainer}>
+          <Header
+            title="Create Booking"
+            showBackButton={true}
+            onBackPress={() => setModalVisible1(false)}
+          />
+          <DispatchNoteForm onFormSuccess={handleFormSuccess} />
         </View>
       </Modal>
     </View>
