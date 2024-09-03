@@ -13,6 +13,7 @@ import { deletePost } from "../../redux/actions/posts";
 import DispatchNoteForm from "../agent/DispatchNoteForm";
 import Header from "../../components/Header";
 import { useSelector } from "react-redux";
+import OrderSummary from "../../components/OrderSummery";
 
 const CakeBookingList = ({ navigation }) => {
   const userData = useSelector((state) => state?.auth?.userData);
@@ -110,6 +111,7 @@ const CakeBookingList = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <OrderSummary orders={posts} />
       <FlatList
         data={posts}
         keyExtractor={(item) => item._id}
@@ -122,7 +124,9 @@ const CakeBookingList = ({ navigation }) => {
                   <IconButton
                     icon="share"
                     size={20}
-                    onPress={() => navigation.navigate("print", {cakeOrder: item})}
+                    onPress={() =>
+                      navigation.navigate("print", { cakeOrder: item })
+                    }
                   />
                   <IconButton
                     icon="pencil"
