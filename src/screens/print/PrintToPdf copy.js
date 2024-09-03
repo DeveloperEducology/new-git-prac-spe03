@@ -4,10 +4,10 @@ import * as Print from "expo-print";
 import { shareAsync } from "expo-sharing";
 
 export default function PrintToPdf({ route }) {
-  const { cakeOrder } = route.params;
+  // const { cakeOrder } = route.params;
   const [selectedPrinter, setSelectedPrinter] = React.useState(null);
 
-  const cakeOrder1 = {
+  const cakeOrder = {
     orderId: "1725347020627",
     senderName: "Sheetal",
     senderPhoneNumber: "9347838726",
@@ -58,7 +58,7 @@ export default function PrintToPdf({ route }) {
     </head>
     <body>
       <div class="header">
-        <h1>Cake Express</h1>
+        <h1>Flavours Guru</h1>
         <h2>Dispatch Note #${cakeOrder.orderId}</h2>
       </div>
       <div class="content">

@@ -12,8 +12,13 @@ import actions from "../../redux/actions";
 import { deletePost } from "../../redux/actions/posts";
 import DispatchNoteForm from "../agent/DispatchNoteForm";
 import Header from "../../components/Header";
+import { useSelector } from "react-redux";
 
 const CakeBookingList = ({ navigation }) => {
+  const userData = useSelector((state) => state?.auth?.userData);
+  console.log(userData);
+
+  const userId = userData?._id;
   const [isModalVisible, setModalVisible] = useState(false);
   const [isModalVisible1, setModalVisible1] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -26,10 +31,29 @@ const CakeBookingList = ({ navigation }) => {
 
   const userPosts = async () => {
     try {
-      const res = await actions.getAllPost();
-      setPosts(res);
+      // Corrected IP address and included userId in the URL
+      const response = await fetch(
+        `http://192.168.29.247:3001/orders/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            // Include the Authorization header if a token is required
+            Authorization: `Bearer ${userData?.token}`, // Assuming you have the token in userData
+          },
+        }
+      );
+
+      if (!response.ok) {
+        // If response is not OK (e.g., 404, 500), handle the error
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json(); // Parse the response JSON
+      console.log("res", data);
+      setPosts(data); // Assuming setPosts is a useState hook
     } catch (error) {
-      console.log("Error fetching posts:", error);
+      console.log("error raised", error);
     }
   };
 
@@ -82,6 +106,8 @@ const CakeBookingList = ({ navigation }) => {
     setModalVisible(false);
   };
 
+  console.log("posts", posts);
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -93,6 +119,11 @@ const CakeBookingList = ({ navigation }) => {
               title={`${item.senderName} ➔ ${item.receiverName}`}
               right={() => (
                 <View style={styles.iconContainer}>
+                  <IconButton
+                    icon="share"
+                    size={20}
+                    onPress={() => navigation.navigate("print", {cakeOrder: item})}
+                  />
                   <IconButton
                     icon="pencil"
                     size={20}
@@ -121,12 +152,7 @@ const CakeBookingList = ({ navigation }) => {
         contentContainerStyle={styles.list}
       />
 
-      <FAB
-        style={styles.fab}
-        small
-        icon="plus"
-        onPress={handleCreate}
-      />
+      <FAB style={styles.fab} small icon="plus" onPress={handleCreate} />
 
       <Modal
         visible={isModalVisible}
@@ -139,7 +165,76 @@ const CakeBookingList = ({ navigation }) => {
             showBackButton={true}
             onBackPress={() => setModalVisible(false)}
           />
-          {/* Your form inputs here */}
+          <View style={styles.modalContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Sender Name"
+              value={formData.senderName}
+              onChangeText={(value) => handleInputChange("senderName", value)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Sender Phone Number"
+              value={formData.senderPhoneNumber}
+              onChangeText={(value) =>
+                handleInputChange("senderPhoneNumber", value)
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Receiver Name"
+              value={formData.receiverName}
+              onChangeText={(value) => handleInputChange("receiverName", value)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Receiver Phone Number"
+              value={formData.receiverPhoneNumber}
+              onChangeText={(value) =>
+                handleInputChange("receiverPhoneNumber", value)
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Cake Name"
+              value={formData.cakeName}
+              onChangeText={(value) => handleInputChange("cakeName", value)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Cake Type"
+              value={formData.cakeType}
+              onChangeText={(value) => handleInputChange("cakeType", value)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Weight/Quantity"
+              value={formData.weightOrQuantity}
+              onChangeText={(value) =>
+                handleInputChange("weightOrQuantity", value)
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Special Wishes"
+              value={formData.specialWishes}
+              onChangeText={(value) =>
+                handleInputChange("specialWishes", value)
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Date"
+              value={formData.date}
+              onChangeText={(value) => handleInputChange("date", value)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Time"
+              value={formData.time}
+              onChangeText={(value) => handleInputChange("time", value)}
+            />
+          </View>
           <Button title="Save" onPress={handleSave} />
           <Button title="Cancel" onPress={() => setModalVisible(false)} />
         </View>

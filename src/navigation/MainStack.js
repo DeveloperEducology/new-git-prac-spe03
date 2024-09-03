@@ -9,12 +9,9 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import CreateAgent from "../screens/admin/CreateAgent";
 import Settings from "../screens/admin/Settings";
 import DispatchNoteForm from "../screens/agent/DispatchNoteForm";
-import DispatchForm from "../screens/admin/DispatchForm";
-
-
+import PrintToPdf from "../screens/print/PrintToPdf";
 
 const Tab = createMaterialBottomTabNavigator();
-
 
 function DetailsScreen({ navigation }) {
   return (
@@ -39,10 +36,11 @@ const Stack = createNativeStackNavigator();
 function MyStacks() {
   return (
     <Stack.Navigator initialRouteName="Home">
-    <Stack.Screen name="dispatch-form" component={DispatchNoteForm} />
+      <Stack.Screen name="dispatch-form" component={DispatchNoteForm} />
       <Stack.Screen name="Home" component={CakeBookingList} />
       <Stack.Screen name="form" component={CakeBookingForm} />
       <Stack.Screen name="CreateAgent" component={CreateAgent} />
+      <Stack.Screen name="print" component={PrintToPdf} />
     </Stack.Navigator>
   );
 }
@@ -50,7 +48,7 @@ function MyStacks() {
 function MyTabs() {
   return (
     <Tab.Navigator>
-    <Tab.Screen name="Orders" component={MyStacks} />
+      <Tab.Screen name="Orders" component={MyStacks} />
       <Tab.Screen name="AdminHome" component={AdminHomeScreen} />
       <Tab.Screen name="Settings" component={Settings} />
     </Tab.Navigator>
