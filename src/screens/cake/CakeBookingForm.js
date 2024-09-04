@@ -1,21 +1,25 @@
-import React from 'react';
-import { View, Text } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { TextInput, Button, RadioButton, Divider } from 'react-native-paper';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import React from "react";
+import { View, Text } from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { TextInput, Button, RadioButton, Divider } from "react-native-paper";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useSelector } from "react-redux";
 
 const CakeBookingForm = () => {
-  const { control, handleSubmit, formState: { errors } } = useForm();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const [date, setDate] = React.useState(new Date());
   const userData = useSelector((state) => state?.auth?.userData);
   const [showDatePicker, setShowDatePicker] = React.useState(false);
-  const [paymentMethod, setPaymentMethod] = React.useState('online');
+  const [status, setStatus] = React.useState();
 
   const onSubmit = (data) => {
-    const orderId = Date.now().toString()
+    const orderId = Date.now().toString();
     // const totalPayment = parseFloat(data.advancedPayment) + parseFloat(data.balancePayment);
-    
+
     const formData = {
       ...data,
       orderId,
@@ -31,7 +35,7 @@ const CakeBookingForm = () => {
     <View style={{ padding: 20 }}>
       <Controller
         control={control}
-        rules={{ required: 'Sender name is required' }}
+        rules={{ required: "Sender name is required" }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             label="Sender Name"
@@ -43,11 +47,13 @@ const CakeBookingForm = () => {
         )}
         name="senderName"
       />
-      {errors.senderName && <Text style={{ color: 'red' }}>{errors.senderName.message}</Text>}
+      {errors.senderName && (
+        <Text style={{ color: "red" }}>{errors.senderName.message}</Text>
+      )}
 
       <Controller
         control={control}
-        rules={{ required: 'Sender phone number is required' }}
+        rules={{ required: "Sender phone number is required" }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             label="Sender Phone Number"
@@ -60,11 +66,13 @@ const CakeBookingForm = () => {
         )}
         name="senderPhoneNumber"
       />
-      {errors.senderPhoneNumber && <Text style={{ color: 'red' }}>{errors.senderPhoneNumber.message}</Text>}
+      {errors.senderPhoneNumber && (
+        <Text style={{ color: "red" }}>{errors.senderPhoneNumber.message}</Text>
+      )}
 
       <Controller
         control={control}
-        rules={{ required: 'Receiver name is required' }}
+        rules={{ required: "Receiver name is required" }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             label="Receiver Name"
@@ -76,11 +84,13 @@ const CakeBookingForm = () => {
         )}
         name="receiverName"
       />
-      {errors.receiverName && <Text style={{ color: 'red' }}>{errors.receiverName.message}</Text>}
+      {errors.receiverName && (
+        <Text style={{ color: "red" }}>{errors.receiverName.message}</Text>
+      )}
 
       <Controller
         control={control}
-        rules={{ required: 'Receiver phone number is required' }}
+        rules={{ required: "Receiver phone number is required" }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             label="Receiver Phone Number"
@@ -93,11 +103,15 @@ const CakeBookingForm = () => {
         )}
         name="receiverPhoneNumber"
       />
-      {errors.receiverPhoneNumber && <Text style={{ color: 'red' }}>{errors.receiverPhoneNumber.message}</Text>}
+      {errors.receiverPhoneNumber && (
+        <Text style={{ color: "red" }}>
+          {errors.receiverPhoneNumber.message}
+        </Text>
+      )}
 
       <Controller
         control={control}
-        rules={{ required: 'Cake name is required' }}
+        rules={{ required: "Cake name is required" }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             label="Cake Name"
@@ -109,11 +123,13 @@ const CakeBookingForm = () => {
         )}
         name="cakeName"
       />
-      {errors.cakeName && <Text style={{ color: 'red' }}>{errors.cakeName.message}</Text>}
+      {errors.cakeName && (
+        <Text style={{ color: "red" }}>{errors.cakeName.message}</Text>
+      )}
 
       <Controller
         control={control}
-        rules={{ required: 'Cake type is required' }}
+        rules={{ required: "Cake type is required" }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             label="Cake Type"
@@ -125,11 +141,13 @@ const CakeBookingForm = () => {
         )}
         name="cakeType"
       />
-      {errors.cakeType && <Text style={{ color: 'red' }}>{errors.cakeType.message}</Text>}
+      {errors.cakeType && (
+        <Text style={{ color: "red" }}>{errors.cakeType.message}</Text>
+      )}
 
       <Controller
         control={control}
-        rules={{ required: 'Weight or quantity is required' }}
+        rules={{ required: "Weight or quantity is required" }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             label="Weight/Quantity"
@@ -141,7 +159,9 @@ const CakeBookingForm = () => {
         )}
         name="weightOrQuantity"
       />
-      {errors.weightOrQuantity && <Text style={{ color: 'red' }}>{errors.weightOrQuantity.message}</Text>}
+      {errors.weightOrQuantity && (
+        <Text style={{ color: "red" }}>{errors.weightOrQuantity.message}</Text>
+      )}
 
       <Controller
         control={control}
@@ -178,16 +198,20 @@ const CakeBookingForm = () => {
 
       <Text>Payment Method</Text>
       <RadioButton.Group
-        onValueChange={newValue => setPaymentMethod(newValue)}
-        value={paymentMethod}
+        onValueChange={(newValue) => setStatus(newValue)}
+        value={formData.status || status}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <RadioButton value="online" />
-          <Text>Online</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <RadioButton value="pending" />
+          <Text>pending</Text>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <RadioButton value="offline" />
-          <Text>Offline</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <RadioButton value="processing" />
+          <Text>processing</Text>
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <RadioButton value="delivered" />
+          <Text>delivered</Text>
         </View>
       </RadioButton.Group>
 

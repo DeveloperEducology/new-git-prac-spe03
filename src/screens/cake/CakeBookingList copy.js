@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   FlatList,
@@ -6,7 +6,6 @@ import {
   Modal,
   TextInput,
   Text,
-  RefreshControl,
 } from "react-native";
 import { FAB, Card, Paragraph, IconButton, Button } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -26,12 +25,6 @@ const CakeBookingList = ({ navigation }) => {
   const [formData, setFormData] = useState({});
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    userPosts().then(() => setRefreshing(false));
-  }, []);
 
   const userId = userData?._id;
 
@@ -124,13 +117,9 @@ const CakeBookingList = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Header
-        title={"Hi, " + userData?.name + userData?.userType}
-        isRightButton={true}
-        onRightButtonPress={() => setShowDatePicker(true)}
-        selectedDate={date}
-      />
-
+      <Button onPress={() => setShowDatePicker(true)}>
+        {moment(date).format("DD-MM-YYYY")}
+      </Button>
       {showDatePicker && (
         <DateTimePicker
           value={date}
@@ -154,14 +143,24 @@ const CakeBookingList = ({ navigation }) => {
             renderItem={({ item }) => (
               <Card
                 style={styles.card}
-                onPress={() =>
-                  navigation.navigate("details", { cakeOrder: item })
-                }
+                onPress={() => navigation.navigate("details", {cakeOrder: item})}
               >
                 <Card.Title
                   title={`${item.senderName} ➔ ${item.receiverName}`}
                   right={() => (
                     <View style={styles.iconContainer}>
+                      <IconButton
+                        icon="share"
+                        size={20}
+                        onPress={() =>
+                          navigation.navigate("print", { cakeOrder: item })
+                        }
+                      />
+                      <IconButton
+                        icon="pencil"
+                        size={20}
+                        onPress={() => handleEdit(item)}
+                      />
                       <IconButton
                         icon="delete"
                         size={20}
@@ -172,29 +171,22 @@ const CakeBookingList = ({ navigation }) => {
                 />
                 <Card.Content>
                   <Paragraph>Cake Name: {item.cakeName}</Paragraph>
-
-                  <Paragraph>Weight/Quantity: {item.weight}</Paragraph>
-
+                  <Paragraph>Cake Type: {item.cakeType}</Paragraph>
+                  <Paragraph>
+                    Weight/Quantity: {item.weightOrQuantity}
+                  </Paragraph>
+                  <Paragraph>Special Wishes: {item.specialWishes}</Paragraph>
                   <Paragraph>order_date: {item.order_date}</Paragraph>
                   <Paragraph>deliveryDate: {item.deliveryDate}</Paragraph>
-                  <Paragraph>Time: {item.time || "6pm to 8pm"}</Paragraph>
+                  <Paragraph>Time: {item.time || "6pm to 8pm" }</Paragraph>
                   <Paragraph>Sender Phone: {item.senderPhoneNumber}</Paragraph>
                   <Paragraph>
                     Receiver Phone: {item.receiverPhoneNumber}
                   </Paragraph>
-                  <Paragraph>Status: {item.status}</Paragraph>
-                  <Paragraph>Agent Name: {item.agentName}</Paragraph>
-                  <View style={{ flexDirection: "row", gap: 10 }}>
-                    <Paragraph>Advance: {item.advance_payment}</Paragraph>
-                    <Paragraph>Balance: {item.balance_payment}</Paragraph>
-                  </View>
                 </Card.Content>
               </Card>
             )}
             contentContainerStyle={styles.list}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
           />
         </>
       ) : (
@@ -315,7 +307,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-    // padding: 10,
+    padding: 10,
   },
   list: {
     paddingBottom: 80,
@@ -336,7 +328,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    padding: 6,
+    padding: 16,
     backgroundColor: "#fff",
   },
   input: {

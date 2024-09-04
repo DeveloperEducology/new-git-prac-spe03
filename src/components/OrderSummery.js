@@ -18,9 +18,9 @@ const OrderSummary = ({ orders }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text1}>Total: Rs.{totalAmount}</Text>
-      <Text style={styles.text2}>Advance: Rs.{totalAdvancedAmount}</Text>
-      <Text style={styles.text3}>Balance : Rs.{totalBalanceAmount}</Text>
+      <Text style={styles.text1}>Total: ₹ {totalAmount}</Text>
+      <Text style={styles.text2}>Advance: ₹ {totalAdvancedAmount}</Text>
+      <Text style={styles.text3}>Balance : ₹ {totalBalanceAmount}</Text>
     </View>
   );
 };

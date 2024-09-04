@@ -7,12 +7,15 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button } from "react-native-paper";
 import { useSelector } from "react-redux";
 import moment from "moment";
+import * as ImagePicker from "react-native-image-picker";
 import { launchImageLibrary } from "react-native-image-picker";
 
 export default function DispatchNoteForm({ navigation, onFormSuccess }) {
@@ -25,42 +28,65 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
   const [image, setImage] = React.useState(null);
   const [imageUri, setImageUri] = useState(null);
   const [value, setValue] = useState(null);
-
+  const [loading, setLoading] = useState(false);
+  const agentId = userId;
   console.log(date);
+  const [user, setUser] = useState("");
+
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const handleImagePicker = () => {
     const options = {
       mediaType: "photo",
-      includeBase64: true,
+      includeBase64: false,
     };
 
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log("User cancelled image picker");
-      } else if (response.error) {
-        console.log("ImagePicker Error: ", response.error);
-      } else {
-        const selectedImage = response.assets[0];
-        setImage(selectedImage);
+    ImagePicker.launchImageLibrary(options, (response) => {
+      if (!response.didCancel && !response.error) {
+        const selectedImage = {
+          uri: response.assets[0].uri,
+          name: response.assets[0].fileName,
+          type: response.assets[0].type,
+        };
+        setSelectedImage(selectedImage);
       }
     });
   };
 
-  const selectImage = () => {
-    launchImageLibrary(
-      { mediaType: "photo", includeBase64: true },
-      (response) => {
-        if (response.didCancel) {
-          console.log("User cancelled image picker");
-        } else if (response.errorMessage) {
-          console.log("ImagePicker Error: ", response.errorMessage);
-        } else {
-          const source = { uri: response.assets[0].uri };
-          setImageUri(source.uri);
-          setValue("imageUri", source.uri); // Set imageUri in form data
-        }
+console.log("image", image)
+
+  const handlePhotoUpload = async () => {
+    if (!selectedImage) {
+      Alert.alert("Error", "No image selected");
+      return;
+    }
+
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append("file", selectedImage);
+
+    try {
+      const response = await fetch(`http://192.168.29.124:3001/fileUpload`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        body: formData,
+      });
+
+      const responseText = await response.text();
+      const data = JSON.parse(responseText);
+      if (response.ok) {
+        setImage(data.data.url);
+      } else {
+        Alert.alert("Error", data.message || "Failed to upload photo");
       }
-    );
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onSubmit = async (data) => {
@@ -75,6 +101,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
       order_date,
       deliveryDate,
       agentName,
+      agentId,
       image, // Include the image as base64
     };
     console.log("Submitting form data:", formData);
@@ -82,7 +109,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
     const handleCreate = async () => {
       try {
         const response = await fetch(
-          `http://192.168.29.247:3001/create-order`,
+          `http://192.168.29.124:3001/create-order`,
           {
             method: "POST",
             headers: {
@@ -129,7 +156,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
               style={styles.input}
               value={value}
               onChangeText={onChange}
-              editable={false} // Disabled as it's static
+              // editable={false} // Disabled as it's static
             />
           )}
         />
@@ -155,7 +182,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
         <Controller
           control={control}
           name="receiverName"
-          defaultValue="Sheetal"
+          defaultValue="vijay"
           render={({ field: { onChange, value } }) => (
             <TextInput
               style={styles.input}
@@ -169,7 +196,7 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
         <Controller
           control={control}
           name="receiverPhoneNumber"
-          defaultValue="9347838726"
+          defaultValue="22222222"
           render={({ field: { onChange, value } }) => (
             <TextInput
               style={styles.input}
@@ -307,19 +334,6 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
 
         {/* Shipping Date */}
         <Text style={styles.label}>Shipping Date:</Text>
-        <Controller
-          control={control}
-          name="deliveryDate"
-          defaultValue={date.toISOString()}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={styles.input}
-              value={value}
-              onChangeText={onChange}
-            />
-          )}
-        />
-
         <Button onPress={() => setShowDatePicker(true)}>
           {date.toDateString()}
         </Button>
@@ -414,21 +428,26 @@ export default function DispatchNoteForm({ navigation, onFormSuccess }) {
           )}
         />
 
-        {/* Image Upload */}
-        <View>
-          <Text style={styles.label}>Upload Image:</Text>
-          <TouchableOpacity
-            style={styles.imageUploadButton}
-            onPress={handleImagePicker}
-          >
-            <Text style={styles.imageUploadText}>Choose Image</Text>
+        <View style={styles.step}>
+          <Text style={styles.subtitle}>Media</Text>
+          <TouchableOpacity style={styles.button} onPress={handleImagePicker}>
+            <Text style={styles.buttonText}>Choose Photo</Text>
           </TouchableOpacity>
-          {image && (
-            <Image
-              source={{ uri: `data:image/jpeg;base64,${image.base64}` }}
-              style={styles.uploadedImage}
-            />
+          {selectedImage && (
+            <View style={styles.imageContainer}>
+              <Image source={{ uri: selectedImage.uri }} style={styles.image} />
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handlePhotoUpload}
+              >
+                <Text style={styles.buttonText}>
+                  {loading ? "Uploading..." : "Upload Photo"}
+                </Text>
+              </TouchableOpacity>
+              {loading && <ActivityIndicator size="small" color="#007BFF" />}
+            </View>
           )}
+          <ScrollView horizontal></ScrollView>
         </View>
       </ScrollView>
       <Button onPress={handleSubmit(onSubmit)} mode="contained">
@@ -482,5 +501,36 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: "contain",
     marginBottom: 10,
+  },
+  step: {
+    padding: 20,
+  },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#007BFF",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+
+  image: {
+    width: 100,
+    height: 100,
+    marginRight: 10,
+    borderRadius: 5,
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  picker: {
+    height: 50,
+    width: "100%",
   },
 });

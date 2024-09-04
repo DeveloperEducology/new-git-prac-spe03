@@ -1,7 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { FAB, Card, Paragraph, IconButton, Button } from "react-native-paper";
+import moment from "moment";
 
 const Header = ({
   title,
@@ -9,17 +17,18 @@ const Header = ({
   rightTitle,
   onBackPress,
   onRightPress,
-  
+  isShare,
+  shareButton,
+  isRightButton,
+  onRightButtonPress,
+  selectedDate
 }) => {
   const navigation = useNavigation();
-  const [isModalVisible1, setModalVisible1] = useState(false);
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+    
       {showBackButton && (
-        <TouchableOpacity
-          onPress={onBackPress}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
       )}
@@ -29,19 +38,30 @@ const Header = ({
           <Text style={styles.rightTitle}>{rightTitle}</Text>
         </TouchableOpacity>
       )}
-    </View>
+      {isRightButton && (
+        <Button onPress={onRightButtonPress}>
+            {moment(selectedDate).format("DD-MM-YYYY")}
+          </Button>
+      )}
+      {isShare && (
+        <TouchableOpacity style={styles.rightButton}>
+          <IconButton icon="share" size={20} onPress={shareButton} />
+        </TouchableOpacity>
+      )}
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    height: 60,
+    height: 80,
+    marginTop: 7,
+    padding: 10,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 15,
     backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
+    borderBottomWidth: 3,
     borderBottomColor: "#e0e0e0",
   },
   backButton: {
@@ -49,7 +69,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    textAlign: "center",
+    // textAlign: "center",
     fontSize: 18,
     fontWeight: "bold",
   },

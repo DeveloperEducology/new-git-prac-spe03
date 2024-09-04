@@ -11,6 +11,7 @@ import MainStack from "./src/navigation/MainStack";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { saveUserData } from "./src/redux/reducers/auth";
 import { getData } from "./src/utils/helperFunctions";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const { dispatch } = store;
 
@@ -31,10 +32,12 @@ export default function App() {
     }
   };
   return (
-    <Provider store={store}>
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
-    </Provider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </Provider>
+    </SafeAreaProvider>
   );
 }

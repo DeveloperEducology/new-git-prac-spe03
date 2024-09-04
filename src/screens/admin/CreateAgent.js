@@ -18,7 +18,7 @@ const CreateAgent = ({ navigation }) => {
 
     console.log("Sending Data:", formData);
     try {
-      const response = await fetch("http://192.168.29.247:3001/agents", {
+      const response = await fetch("http://192.168.29.124:3001/agents", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,12 +44,11 @@ const CreateAgent = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create Agent</Text>
-
       <Controller
         control={control}
         name="agentName"
         rules={{ required: "Agent name is required" }}
+        defaultValue="Sheetal"
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             style={styles.input}
